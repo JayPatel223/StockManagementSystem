@@ -16,12 +16,14 @@ class ProductForm extends StatefulWidget {
 class _ProductFormState extends State<ProductForm> {
   TextEditingController _productNameController = TextEditingController();
   TextEditingController _productStockController = TextEditingController(text: "0");
+  TextEditingController _productQntController = TextEditingController(text: "1"); // Add Qnt controller
   String? _productId;
 
   @override
   void dispose() {
     _productNameController.dispose();
     _productStockController.dispose();
+    _productQntController.dispose(); // Dispose of the Qnt controller
     super.dispose();
   }
 
@@ -29,6 +31,7 @@ class _ProductFormState extends State<ProductForm> {
     setState(() {
       _productNameController.text = product.productName;
       _productStockController.text = product.productStock.toString();
+      _productQntController.text = product.qnt.toString(); // Populate Qnt
       _productId = product.id;
     });
   }
@@ -44,9 +47,9 @@ class _ProductFormState extends State<ProductForm> {
   Future<void> saveData() async {
     String productName = _productNameController.text;
     int productStock = int.tryParse(_productStockController.text) ?? 0;
+    int productQnt = int.tryParse(_productQntController.text) ?? 1; // Handle Qnt
 
-    if (_productNameController.text.isEmpty ||
-        _productStockController.text.isEmpty) {
+    if (productName.isEmpty || _productStockController.text.isEmpty || _productQntController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill all data'),
@@ -83,6 +86,7 @@ class _ProductFormState extends State<ProductForm> {
         ProductModel newProduct = ProductModel(
           productName: productName,
           productStock: productStock,
+          qnt: productQnt, // Add Qnt field here
           id: newDocRef.id,
         );
 
@@ -105,6 +109,7 @@ class _ProductFormState extends State<ProductForm> {
         ProductModel updatedProduct = ProductModel(
           productName: productName,
           productStock: productStock,
+          qnt: productQnt, // Add Qnt field here
           id: _productId!,
         );
 
@@ -126,6 +131,7 @@ class _ProductFormState extends State<ProductForm> {
       // Clear form and reset state
       _productNameController.clear();
       _productStockController.clear();
+      _productQntController.clear(); // Clear Qnt field
     } catch (e) {
       print('Error saving product to Firestore: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -168,10 +174,22 @@ class _ProductFormState extends State<ProductForm> {
                   controller: _productStockController,
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly, // Allows only digits
+                    FilteringTextInputFormatter.digitsOnly,
                   ],
                   decoration: InputDecoration(
                     labelText: 'Product Stock',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: _productQntController, // Add Qnt field
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Quantity in Box',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -186,13 +204,6 @@ class _ProductFormState extends State<ProductForm> {
                   child: TextButton(
                     onPressed: () {
                       saveData();
-                      // TODO: Implement form submission logic
-                      String productName = _productNameController.text;
-                      int productStock = int.tryParse(_productStockController.text) ?? 0;
-
-                      // You can process or submit the data here
-                      print('Product Name: $productName');
-                      print('Product Stock: $productStock');
                     },
                     child: Text(
                       widget.productData != null ? 'Update' : 'Submit',

@@ -4,6 +4,7 @@ class EntryModel {
   final String productName;
   final double productPrice;
   final int productQuantity;
+  final int boxes;
   final double totalPrice;
   final String sellerName;
   final String paymentMode;
@@ -14,6 +15,7 @@ class EntryModel {
     required this.productName,
     required this.productPrice,
     required this.productQuantity,
+    required this.boxes,
     required this.totalPrice,
     required this.sellerName,
     required this.paymentMode,
@@ -28,6 +30,7 @@ class EntryModel {
       productName: data['productName'],
       productPrice: data['productPrice'],
       productQuantity: data['productQuantity'],
+      boxes: data['boxes'],
       totalPrice: data['totalPrice'],
       sellerName: data['sellerName'],
       paymentMode: data['paymentMode'],
@@ -41,6 +44,7 @@ class EntryModel {
       'productName': productName,
       'productPrice': productPrice,
       'productQuantity': productQuantity,
+      'boxes': boxes,
       'totalPrice': totalPrice,
       'sellerName': sellerName,
       'paymentMode': paymentMode,

@@ -130,8 +130,8 @@ class GlobalData {
 
     productData = snapshot.docs.map((doc) => ProductModel.fromFirestore(doc)).toList();
 
-    print("Product ${productData[0].productName}");
-    print("${productData.length}");
+    // print("Product ${productData[0].productName}");
+    // print("${productData.length}");
   }
 
   static Future<void> updateProductStock(String productName, int stockChange) async {

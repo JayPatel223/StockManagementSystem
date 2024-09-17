@@ -24,6 +24,7 @@ class ProductDataTableSource extends DataTableSource {
       cells: [
         DataCell(Text(product.productName)),
         DataCell(Text(product.productStock.toString())),
+        DataCell(Text(product.qnt.toString())),
         DataCell(
           Row(
             children: [
@@ -83,10 +84,10 @@ class _ProductDataPageState extends State<ProductDataPage> {
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    fetchData();
   }
 
-  Future<void> _fetchData() async {
+  Future<void> fetchData() async {
     // Replace with your data fetching logic
     // await GlobalData.fetchProductData();
     setState(() {
@@ -166,7 +167,7 @@ class _ProductDataPageState extends State<ProductDataPage> {
                         MaterialPageRoute(builder: (context) => ProductForm()),
                       ).then((_) {
                         setState(() {
-                          _fetchData();
+                          fetchData();
                         });
                       });
                     },
@@ -234,6 +235,7 @@ class _ProductDataPageState extends State<ProductDataPage> {
                       columns: [
                         DataColumn(label: Text('Product Name', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Stock', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text('Quantity in Box', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Actions', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                       ],
                       source: _dataSource!,

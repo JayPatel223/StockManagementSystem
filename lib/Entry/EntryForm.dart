@@ -23,6 +23,7 @@ class _EntryFormState extends State<EntryForm> {
   TextEditingController _sellerNameController = TextEditingController();
   TextEditingController _dateController = TextEditingController(text: _formatDate(DateTime.now()));
   TextEditingController _timeController = TextEditingController(text: _formatTime(TimeOfDay.now()));
+  TextEditingController _boxController = TextEditingController();
   String _paymentMode = 'Cash'; // Default value for Payment Mode dropdown
   String? _entryId;
   String? _selectedProductName;
@@ -36,6 +37,7 @@ class _EntryFormState extends State<EntryForm> {
     _totalPriceController.dispose();
     _sellerNameController.dispose();
     _dateController.dispose();
+    _boxController.dispose();
     super.dispose();
   }
 
@@ -50,6 +52,7 @@ class _EntryFormState extends State<EntryForm> {
       _dateController.text = _formatDate(entry.date);
       _paymentMode = entry.paymentMode;
       _entryId = entry.id; // Store the ID of the entry being edited
+      _boxController.text = entry.boxes.toString();
     });
   }
 
@@ -111,6 +114,7 @@ class _EntryFormState extends State<EntryForm> {
     String productName = _productNameController.text;
     double productPrice = double.tryParse(_productPriceController.text) ?? 0.0;
     int productQuantity = int.tryParse(_productQuantityController.text) ?? 0;
+    int boxes = int.tryParse(_boxController.text) ?? 0;
     double totalPrice = double.tryParse(_totalPriceController.text) ?? 0.0;
     String sellerName = _sellerNameController.text;
 
@@ -118,7 +122,8 @@ class _EntryFormState extends State<EntryForm> {
         _productPriceController.text.isEmpty ||
         _productQuantityController.text.isEmpty ||
         _totalPriceController.text.isEmpty ||
-        _sellerNameController.text.isEmpty) {
+        _sellerNameController.text.isEmpty ||
+        _boxController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill all data'),
@@ -154,6 +159,7 @@ class _EntryFormState extends State<EntryForm> {
       paymentMode: _paymentMode,
       date: dateTime, // Use the combined date and time
       id: newDocRef.id,
+      boxes: boxes,
     );
 
     GlobalData.entryData.add(newEntry);
@@ -193,6 +199,7 @@ class _EntryFormState extends State<EntryForm> {
       _productQuantityController.clear();
       _totalPriceController.clear();
       _sellerNameController.clear();
+      _boxController.clear();
       _dateController.text = _formatDate(DateTime.now());
       _timeController.text = _formatTime(TimeOfDay.now());
       setState(() {
@@ -218,6 +225,7 @@ class _EntryFormState extends State<EntryForm> {
     String productName = _selectedProductName ?? "";
     double productPrice = double.tryParse(_productPriceController.text) ?? 0.0;
     int productQuantity = int.tryParse(_productQuantityController.text) ?? 0;
+    int boxes = int.tryParse(_boxController.text) ?? 0;
     double totalPrice = double.tryParse(_totalPriceController.text) ?? 0.0;
     String sellerName = _sellerNameController.text;
 
@@ -225,7 +233,8 @@ class _EntryFormState extends State<EntryForm> {
         _productPriceController.text.isEmpty ||
         _productQuantityController.text.isEmpty ||
         _totalPriceController.text.isEmpty ||
-        _sellerNameController.text.isEmpty) {
+        _sellerNameController.text.isEmpty ||
+        _boxController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill all data'),
@@ -284,6 +293,7 @@ class _EntryFormState extends State<EntryForm> {
           paymentMode: _paymentMode,
           date: dateTime,
           id: newDocRef.id,
+          boxes: boxes,
         );
 
         GlobalData.entryData.add(newEntry);
@@ -315,6 +325,7 @@ class _EntryFormState extends State<EntryForm> {
           paymentMode: _paymentMode,
           date: dateTime,
           id: _entryId!,
+          boxes: boxes,
         );
 
         await docRef.update(updatedEntry.toMap());
@@ -359,6 +370,7 @@ class _EntryFormState extends State<EntryForm> {
       _productQuantityController.clear();
       _totalPriceController.clear();
       _sellerNameController.clear();
+      _boxController.clear();
       _dateController.text = _formatDate(DateTime.now());
       _timeController.text = _formatTime(TimeOfDay.now());
       setState(() {
@@ -485,6 +497,26 @@ class _EntryFormState extends State<EntryForm> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: _boxController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Box Count',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (val) {
+                    // Automatically calculate quantity based on boxes
+                    if (_boxController.text.isNotEmpty) {
+                      ProductModel selectedProduct = _productList.firstWhere((product) => product.productName == _selectedProductName);
+                      int quantityPerBox = selectedProduct.qnt;
+                      _productQuantityController.text = (int.parse(val) * quantityPerBox).toString();
+                      _totalPriceController.text = (int.parse(_productQuantityController.text) * double.parse(_productPriceController.text)).toString();
+                    }else{
+                      _boxController.text = "0";
+                    }
+                  },
                 ),
                 SizedBox(height: 16.0),
                 Row(

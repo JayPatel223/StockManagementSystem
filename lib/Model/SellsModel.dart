@@ -4,6 +4,7 @@ class Sellsmodel {
   final String productName;
   final double productPrice;
   final int productQuantity;
+  final int boxes;
   final double totalPrice;
   final String buyerName;
   final String paymentMode;
@@ -14,6 +15,7 @@ class Sellsmodel {
     required this.productName,
     required this.productPrice,
     required this.productQuantity,
+    required this.boxes,
     required this.totalPrice,
     required this.buyerName,
     required this.paymentMode,
@@ -28,6 +30,7 @@ class Sellsmodel {
       productName: data['productName'],
       productPrice: data['productPrice'],
       productQuantity: data['productQuantity'],
+      boxes: data['boxes'],
       totalPrice: data['totalPrice'],
       buyerName: data['buyerName'],
       paymentMode: data['paymentMode'],
@@ -41,6 +44,7 @@ class Sellsmodel {
       'productName': productName,
       'productPrice': productPrice,
       'productQuantity': productQuantity,
+      'boxes': boxes,
       'totalPrice': totalPrice,
       'buyerName': buyerName,
       'paymentMode': paymentMode,

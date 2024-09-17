@@ -52,6 +52,15 @@ class SellsDataTableSource extends DataTableSource {
         ),
         DataCell(
           SizedBox(
+            width: 80,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Text(Sells.boxes.toString()),
+            ),
+          ),
+        ),
+        DataCell(
+          SizedBox(
             width: 100,
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -238,6 +247,7 @@ class _SellsdataState extends State<Sellsdata> {
       'Product Name',
       'Price',
       'Quantity',
+      'Boxes',
       'Total Price',
       'Seller Name',
       'Payment Mode',
@@ -254,6 +264,7 @@ class _SellsdataState extends State<Sellsdata> {
         Sells.productName,
         Sells.productPrice,
         Sells.productQuantity,
+        Sells.boxes,
         Sells.totalPrice,
         Sells.buyerName,
         Sells.paymentMode,
@@ -301,7 +312,7 @@ class _SellsdataState extends State<Sellsdata> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 150),
+        padding: EdgeInsets.symmetric(horizontal: 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -421,6 +432,7 @@ class _SellsdataState extends State<Sellsdata> {
                     DataColumn(label: Text('Product Name',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Price',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Quantity',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
+                    DataColumn(label: Text('Boxes',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Total Price',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Seller Name',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Payment Mode',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),

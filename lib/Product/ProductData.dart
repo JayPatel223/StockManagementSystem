@@ -24,6 +24,7 @@ class ProductDataTableSource extends DataTableSource {
       cells: [
         DataCell(Text(product.productName)),
         DataCell(Text(product.productStock.toString())),
+        DataCell(Text("${(product.productStock ~/ product.qnt)}")),
         DataCell(Text(product.qnt.toString())),
         DataCell(
           Row(
@@ -235,6 +236,7 @@ class _ProductDataPageState extends State<ProductDataPage> {
                       columns: [
                         DataColumn(label: Text('Product Name', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Stock', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text('Stock in Box', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Quantity in Box', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Actions', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))),
                       ],

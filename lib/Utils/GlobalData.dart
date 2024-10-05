@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:harsh/Model/SellsModel.dart';
 import 'package:intl/intl.dart';
 
@@ -6,7 +9,10 @@ import '../Model/EntryModel.dart';
 import '../Model/ProductModel.dart';
 
 class GlobalData {
+
   static List<EntryModel> entryData = [];
+  static String ShopName = "";
+  static String gstno = "";
 
   // Global variables to store the sums
   static double totalEntryPrice = 0.0;
@@ -16,6 +22,14 @@ class GlobalData {
   static double totalSellsPrice = 0.0;
   static double sellsonlinePaymentTotal = 0.0;
   static double sellscashPaymentTotal = 0.0;
+
+
+  static String formattedNetRevenue = NumberFormat.currency(
+    locale: 'en_IN', // Use the Indian locale
+    symbol: '₹', // Currency symbol
+    decimalDigits: 0, // No decimal places
+  ).format(GlobalData.totalSellsPrice - GlobalData.totalEntryPrice);
+
 
   static String formattedEntryPrice = NumberFormat.currency(
     locale: 'en_IN', // Use the Indian locale
@@ -54,7 +68,46 @@ class GlobalData {
   ).format(GlobalData.sellscashPaymentTotal);
 
 
+  static Future<void> fetchRemoteConfigData() async {
+    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+
+    try {
+      // Set remote config settings
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(minutes: 5),
+      ));
+
+      // Set default values if needed
+      await remoteConfig.setDefaults({
+        'logindetails': jsonEncode({
+          'username': 'default_username',
+          'password': 'default_password',
+        }),
+      });
+
+      // Fetch remote config data
+      await remoteConfig.fetchAndActivate();
+
+      // Retrieve the login details
+      final String loginDetailsString = remoteConfig.getString('logindetails');
+      final Map<String, dynamic> loginDetails = jsonDecode(loginDetailsString);
+
+        ShopName = loginDetails['shopname'];
+        gstno = loginDetails['gstno'];
+
+
+      print("ShopName : $ShopName");
+      print("GSTNo : $gstno");
+
+    } catch (e) {
+      print('Failed to fetch remote config: $e');
+    }
+  }
+
+
   static Future<void> fetchEntries() async {
+    entryData.clear();
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('DataEntry')
         .get();
@@ -107,6 +160,7 @@ class GlobalData {
   static List<Sellsmodel> sellsData = [];
 
   static Future<void> fetchSells() async {
+    sellsData.clear();
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('SellsData')
         .get();

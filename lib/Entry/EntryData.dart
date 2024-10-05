@@ -4,11 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import '../Model/EntryModel.dart';
 import '../Utils/GlobalData.dart';
 import 'EntryForm.dart';
 import 'dart:html' as html;
 import 'dart:convert' as convert;
+import 'package:pdf/widgets.dart' as pw;
 
 class EntryDataTableSource extends DataTableSource {
   final List<EntryModel> entryList;
@@ -21,6 +24,125 @@ class EntryDataTableSource extends DataTableSource {
     if (index >= entryList.length) return null;
 
     final entry = entryList[index];
+
+    void printInvoice(EntryModel entry) async {
+      final pdf = pw.Document();
+
+      // Define your invoice details here
+      final shopTitle = GlobalData.ShopName;
+      final gstNo = GlobalData.gstno;
+      final sellerName = entry.sellerName; // Use data from the entry model
+      final date = DateFormat('yyyy-MM-dd').format(entry.date);
+      final productName = entry.productName; // Assuming entry has product name field
+      final productPrice = entry.productPrice.toString(); // Assuming entry has product price
+      final quantity = entry.productQuantity.toString(); // Assuming entry has quantity field
+      final quantityInBox = entry.boxes.toString(); // Assuming entry has box quantity field
+      final paymentMode = entry.paymentMode; // Assuming entry has payment mode field
+      final totalpayment = entry.totalPrice; // Assuming entry has payment mode field
+
+      // Create the PDF content
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Padding(
+              padding: const pw.EdgeInsets.all(24.0),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Center(
+                    child: pw.Text(
+                      shopTitle,
+                      style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('GST No: $gstNo', style: pw.TextStyle(fontSize: 16)),
+                      pw.Text('Date: $date', style: pw.TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Vendor Name: $sellerName', style: pw.TextStyle(fontSize: 16)),
+                  pw.SizedBox(height: 10),
+                  pw.Divider(),
+                  pw.SizedBox(height: 10),
+                  pw.Text('Product Details', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 10),
+
+                  // Product Details in a Table
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    children: [
+                      // Header Row
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Product Name', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Price', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Quantity', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Quantity in Box', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                      // Data Row
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(productName, style: pw.TextStyle(fontSize: 16)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('${productPrice}', style: pw.TextStyle(fontSize: 16)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(quantity, style: pw.TextStyle(fontSize: 16)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(quantityInBox, style: pw.TextStyle(fontSize: 16)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Payment Mode: $paymentMode', style: pw.TextStyle(fontSize: 16)),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Total Amount: $totalpayment', style: pw.TextStyle(fontSize: 18,fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 20),
+                  pw.Divider(),
+                  pw.SizedBox(height: 20),
+                  // pw.Center(
+                  //   child: pw.Text(
+                  //     'Thank you!',
+                  //     style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+                  //   ),
+                  // ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      // Print the PDF
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+    }
+
     return DataRow(
       cells: [
         DataCell(
@@ -97,9 +219,15 @@ class EntryDataTableSource extends DataTableSource {
         ),
         DataCell(
           SizedBox(
-            width: 200,
+            width: 300,
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(Icons.print),
+                  onPressed: () {
+                    printInvoice(entry);
+                  },
+                ),
                 IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
@@ -121,6 +249,7 @@ class EntryDataTableSource extends DataTableSource {
                     entryList.remove(entry);
                     notifyListeners();
                     GlobalData.entryData.remove(entry);
+                    GlobalData.updateProductStock(entry.productName, -entry.productQuantity);
                   },
                 ),
               ],
@@ -249,7 +378,7 @@ class _EntrydataState extends State<Entrydata> {
       'Quantity',
       'Boxes',
       'Total Price',
-      'Seller Name',
+      'Vendor Name',
       'Payment Mode',
       'Date',
     ]);
@@ -312,7 +441,7 @@ class _EntrydataState extends State<Entrydata> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 80),
+        padding: EdgeInsets.symmetric(horizontal: 50),
         child:Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -374,7 +503,7 @@ class _EntrydataState extends State<Entrydata> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  labelText: 'Search by Product Name or Seller Name',
+                  labelText: 'Search by Product Name or Vendor Name',
                   suffixIcon: IconButton(
                     icon: Icon(Icons.search),
                     onPressed: () => _runSearch(_searchController.text),
@@ -434,7 +563,7 @@ class _EntrydataState extends State<Entrydata> {
                     DataColumn(label: Text('Quantity',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Boxes',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Total Price',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
-                    DataColumn(label: Text('Seller Name',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
+                    DataColumn(label: Text('Vendor Name',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Payment Mode',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Date',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),
                     DataColumn(label: Text('Actions',style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.bold),)),

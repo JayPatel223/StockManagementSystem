@@ -133,8 +133,7 @@ class _SellsFormState extends State<SellsForm> {
         _productPriceController.text.isEmpty ||
         _productQuantityController.text.isEmpty ||
         _totalPriceController.text.isEmpty ||
-        _sellerNameController.text.isEmpty ||
-        _boxController.text.isEmpty) {
+        _sellerNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill all data'),

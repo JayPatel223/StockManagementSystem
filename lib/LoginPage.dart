@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:harsh/Dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -73,10 +74,12 @@ class _LoginPageState extends State<LoginPage> {
     await Future.delayed(Duration(seconds: 2)); // Simulate a delay for the loading dialog
 
     Navigator.pop(context);
-    setState(() {
+    setState(() async {
       if (_usernameController.text == username && _passwordController.text == password) {
         print("Login Successful!");
         loginres =  "Login Successful!";
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
         setState(() {
 
         });

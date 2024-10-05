@@ -43,7 +43,9 @@ dependencies:
   excel: ^2.0.7
   path_provider: ^2.0.11
   dropdown_search: ^5.0.3
-
+  shared_preferences: ^2.0.6
+  pdf: ^3.10.1
+  printing: ^5.11.0
 
 dev_dependencies:
   flutter_test:

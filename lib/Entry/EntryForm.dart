@@ -233,8 +233,7 @@ class _EntryFormState extends State<EntryForm> {
         _productPriceController.text.isEmpty ||
         _productQuantityController.text.isEmpty ||
         _totalPriceController.text.isEmpty ||
-        _sellerNameController.text.isEmpty ||
-        _boxController.text.isEmpty) {
+        _sellerNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill all data'),
@@ -405,7 +404,18 @@ class _EntryFormState extends State<EntryForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Entry Data',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),),
+                Row(
+                  children: [
+                    IconButton(
+                        icon: Icon(Icons.arrow_back),
+                      onPressed: (){
+                          Navigator.pop(context,true);
+                      },
+                    ),
+                    SizedBox(width: 20,),
+                    Text('Entry Data',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),),
+                  ],
+                ),
                 SizedBox(height: 30,),
                 DropdownSearch<String>(
                   popupProps: PopupProps.dialog(
@@ -539,7 +549,7 @@ class _EntryFormState extends State<EntryForm> {
                       child: TextField(
                         controller: _sellerNameController,
                         decoration: InputDecoration(
-                          labelText: 'Seller Name',
+                          labelText: 'Vendor Name',
                           border: OutlineInputBorder(),
                         ),
                       ),
